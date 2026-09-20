@@ -1,40 +1,50 @@
-name: "CodeQL Security Scan"
+name: "Tapiz Engine - CodeQL"
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - principal
+
   pull_request:
+    branches:
+      - principal
+
+  schedule:
+    - cron: "29 21 * * 5"
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "codeql-${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
 
 jobs:
   analyze:
-    name: Analyze (Python)
+    name: "CodeQL - Python"
     runs-on: ubuntu-latest
 
     permissions:
-      security-events: write
       contents: read
+      security-events: write
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+          persist-credentials: false
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: python
-          queries: ./.github/codeql/queries
+          build-mode: none
+          queries: security-extended
 
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v3
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
-- name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v4
         with:
-          languages: python
-          queries: ./.github/codeql/queries
-          config: |
-            paths-ignore:
-              - node_modules
-              - "*.js"
+          category: "/language:python"
