@@ -1,482 +1,169 @@
 Valores-
 
-Descripcion
+Descripción
 
-Valores- es un componente del ecosistema Tapiz orientado a explorar modelos, conectores y herramientas de analisis mediante una arquitectura modular, verificable y extensible.
+Valores- es un componente del ecosistema Tapiz dedicado a la observación, organización y análisis de estructuras.
 
-El proyecto separa deliberadamente las responsabilidades del sistema para evitar que la logica principal dependa directamente de servicios externos, automatizaciones o herramientas de auditoria.
+Su diseño busca mantener un núcleo pequeño, independiente y verificable, donde cada componente tenga una responsabilidad clara.
 
-La arquitectura se organiza alrededor de cinco capas:
+El proyecto prioriza:
 
-                    VALORES-
-                        |
-        +---------------+---------------+
-        |               |               |
-     LOGICA         CONECTORES      AUTOMATIZACION
-        |               |               |
-        +---------------+---------------+
-                        |
-                    SEGURIDAD
-                        |
-                        v
-                    AUDITORIA
+- simplicidad
+- independencia
+- trazabilidad
+- observación
+- modularidad
+- verificabilidad
 
-El objetivo no es concentrar todas las funciones en un unico componente, sino construir un sistema donde cada pieza pueda ser analizada, sustituida y verificada de manera independiente.
+La estructura interna puede evolucionar sin quedar atada a servicios o plataformas externas.
+
+---
+
+Filosofía
+
+Valores- sigue una idea central:
+
+«La estructura debe permanecer independiente del entorno.»
+
+Los componentes externos, cuando existen, son considerados interfaces y no autoridades sobre la lógica interna.
+
+Tapiz:
+
+OBSERVA
+CONSULTA
+VERIFICA
+
+La ejecución pertenece a una capa distinta.
 
 ---
 
 Arquitectura
 
-Valores-
- |
- +-- Python
- |    |
- |    +-- runner
- |    |
- |    +-- conectores
- |    |
- |    +-- modelos
- |    |
- |    +-- analisis
- |    |
- |    +-- utilidades
- |
- +-- JavaScript
- |    |
- |    +-- Hardhat
- |    |
- |    +-- contratos
- |    |
- |    +-- scripts
- |
- +-- .github
-      |
-      +-- workflows
-           |
-           +-- CodeQL
-           |
-           +-- verificaciones
+                         VALORES-
+                            |
+          +-----------------+-----------------+
+          |                 |                 |
+        NÚCLEO           OBSERVACIÓN       ANÁLISIS
+          |                 |                 |
+          +-----------------+-----------------+
+                            |
+                         RESULTADO
 
-La separacion permite mantener una frontera clara entre la logica que pertenece al proyecto y los componentes utilizados para interactuar con sistemas externos.
-
-dato
- |
- v
-modelo
- |
- v
-logica
- |
- +----> conector externo
- |
- v
-resultado
- |
- v
-verificacion
-
-Los conectores no deben convertirse en la logica central del sistema.
+La arquitectura está diseñada para que sus componentes puedan evolucionar, reemplazarse o analizarse de manera independiente.
 
 ---
 
-Python
+Independencia
 
-Python contiene la parte principal de exploracion y ejecucion.
+Valores- no depende de una plataforma externa para definir su estructura.
 
-Python
- |
- +-- runner
- |    |
- |    +-- ejecucion
- |    +-- coordinacion
- |
- +-- modelos
- |    |
- |    +-- representacion
- |    +-- transformacion
- |
- +-- conectores
- |    |
- |    +-- interfaces externas
- |
- +-- analisis
-      |
-      +-- datos
-      +-- resultados
+El núcleo está pensado para funcionar con una base mínima y con la menor cantidad posible de dependencias.
 
-La responsabilidad del "runner" es coordinar componentes, no absorber su implementacion.
-
-Los modelos representan datos y estados.
-
-Los conectores proporcionan una frontera controlada hacia sistemas externos.
+No se incorporan servicios externos cuando no son necesarios para el funcionamiento del sistema.
 
 ---
 
-JavaScript y contratos
+Observación
 
-La parte JavaScript esta orientada al entorno de contratos y herramientas asociadas.
+La observación ocupa un lugar central.
 
-JavaScript
-    |
-    +-- Hardhat
-    |     |
-    |     +-- compilacion
-    |     +-- pruebas
-    |     +-- despliegue
-    |
-    +-- contratos
-          |
-          +-- Solidity
+Observar no significa ejecutar.
 
-Hardhat funciona como herramienta de desarrollo y verificacion del entorno de contratos.
+El sistema puede estudiar un estado, registrar evidencia y producir un resultado sin convertir ese proceso en una acción sobre el entorno.
 
-La logica de contratos permanece separada de la logica Python.
-
-Python
-   |
-   | modelo / analisis
-   v
-resultado
+ENTORNO
    |
    v
-JavaScript
+OBSERVACIÓN
    |
    v
-contrato
-
-Esta separacion evita acoplamientos innecesarios entre las distintas capas.
-
----
-
-Conectores
-
-Los componentes externos deben tratarse como conectores.
-
-                 LOGICA TAPIZ
-                      |
-                      v
-                  INTERFAZ
-                      |
-          +-----------+-----------+
-          |                       |
-          v                       v
-      conector A             conector B
-          |                       |
-          v                       v
-     servicio externo       servicio externo
-
-Un conector debe limitarse a resolver la comunicacion con el sistema externo.
-
-La logica de negocio, los modelos y las decisiones deben permanecer fuera del conector siempre que sea posible.
-
-Esto permite sustituir un proveedor sin reconstruir el sistema completo.
-
----
-
-Automatizacion
-
-La automatizacion se mantiene separada de la logica principal.
-
-.github
+ANÁLISIS
    |
-   +-- workflows
-          |
-          +-- pruebas
-          +-- seguridad
-          +-- validaciones
-          +-- analisis
-
-Los workflows ejecutan comprobaciones sobre el repositorio, pero no deben convertirse en una dependencia necesaria para comprender o ejecutar la logica central.
+   v
+RESULTADO
 
 ---
 
-Seguridad
+Modularidad
 
-El repositorio utiliza GitHub Actions con CodeQL para realizar analisis automatico del codigo.
+Los componentes se mantienen separados para evitar que una sola pieza concentre responsabilidades que pertenecen a otras.
 
-El workflow principal:
+              VALORES-
+                  |
+        +---------+---------+
+        |         |         |
+      núcleo   observación análisis
+        |         |         |
+        +---------+---------+
+                  |
+               resultado
 
-.github/workflows/new.codeql.yml
+Esta separación permite mantener el proyecto pequeño y facilitar su evolución.
 
-realiza analisis sobre:
+---
 
-JavaScript
+Dependencias
+
+La prioridad es mantener una base reducida.
+
+Las dependencias externas no forman parte de la identidad de Valores- y solamente deben incorporarse cuando aporten una capacidad realmente necesaria.
+
+El objetivo es que el núcleo permanezca independiente.
+
+---
+
+Verificación
+
+Los resultados deben poder ser observados y comprobados sin depender de una autoridad externa.
+
+La verificabilidad forma parte del diseño del sistema.
+
+estructura
     |
     v
-  CodeQL
+observación
+    |
+    v
+verificación
     |
     v
 resultado
-
-
-Python
-    |
-    v
-  CodeQL
-    |
-    v
-resultado
-
-El objetivo es detectar posibles problemas de seguridad durante el desarrollo sin modificar la logica funcional del proyecto.
-
-La seguridad se considera una capa de verificacion:
-
-codigo
-  |
-  v
-analisis
-  |
-  v
-hallazgos
-  |
-  v
-revision
-
----
-
-Auditoria
-
-La auditoria debe permanecer separada de la ejecucion normal.
-
-             PROYECTO
-                |
-       +--------+--------+
-       |                 |
-       v                 v
-    EJECUCION         AUDITORIA
-       |                 |
-       v                 v
-    resultado        verificacion
-                         |
-                         v
-                      reporte
-
-Esto permite analizar el sistema sin introducir observadores innecesarios dentro de la logica principal.
-
----
-
-Principio de separacion
-
-La arquitectura puede resumirse como:
-
-LOGICA
-  |
-  +-- no depende directamente de servicios externos
-  |
-  +-- no depende de auditoria
-  |
-  +-- no depende de automatizacion
-  |
-  v
-INTERFACES
-  |
-  +-- conectores
-  +-- herramientas
-  +-- verificadores
-
-Cada capa tiene una responsabilidad definida.
-
-logica
-  |
-  v
-modelo
-  |
-  v
-conector
-  |
-  v
-externo
-
-El flujo inverso tambien debe poder verificarse:
-
-externo
-  |
-  v
-conector
-  |
-  v
-modelo
-  |
-  v
-logica
-
----
-
-Filosofia
-
-Valores- busca mantener una arquitectura donde los componentes externos sean herramientas y no autoridades sobre la logica interna.
-
-Los servicios externos pueden proporcionar:
-
-- datos
-- interfaces
-- ejecucion
-- verificaciones
-- infraestructura
-
-pero la estructura interna debe permanecer bajo control del proyecto.
-
-externo
-   |
-   v
-conector
-   |
-   v
-modelo
-   |
-   v
-logica
-   |
-   v
-decision
-
-La frontera es importante:
-
-+-----------------------------+
-|        VALORES-             |
-|                             |
-|  logica                     |
-|  modelos                    |
-|  analisis                   |
-|  decisiones                 |
-|                             |
-+-------------+---------------+
-              |
-              v
-       interfaz controlada
-              |
-              v
-+-----------------------------+
-|      componentes externos   |
-+-----------------------------+
 
 ---
 
 Desarrollo
 
-Requisitos
-
-Python
-Node.js
-npm
-Hardhat
-
-Hardhat es necesario cuando se trabaja con contratos.
-
-Instalacion
-
-git clone <repositorio>
-cd Valores-
-
-Python
-
-pip install -r requirements.txt
-
-Node.js
-
-npm install
-
-Contratos
-
-Si el proyecto utiliza Hardhat:
-
-npx hardhat
-
-Los comandos concretos de compilacion, prueba o despliegue deben depender de la estructura existente del proyecto.
-
----
-
-Verificacion
-
-Las comprobaciones automaticas se ejecutan mediante GitHub Actions.
-
-GitHub
-   |
-   v
-Actions
-   |
-   +-- Python
-   |
-   +-- JavaScript
-   |
-   v
-CodeQL
-   |
-   v
-analisis
-   |
-   v
-reporte
-
-El flujo de verificacion no sustituye las pruebas del proyecto; funciona como una capa adicional de analisis.
-
----
-
-Flujo general
-
-La arquitectura completa puede representarse como:
-
-                    DATO
-                      |
-                      v
-                  MODELO
-                      |
-                      v
-                   LOGICA
-                      |
-          +-----------+-----------+
-          |                       |
-          v                       v
-      CONECTOR                ANALISIS
-          |                       |
-          v                       |
-      EXTERNO                     |
-          |                       |
-          +-----------+-----------+
-                      |
-                      v
-                   RESULTADO
-                      |
-                      v
-                 VERIFICACION
-                      |
-                      v
-                    DECISION
-
-La automatizacion y la auditoria observan el proceso desde una capa independiente:
-
-                     PROYECTO
-                        |
-        +---------------+---------------+
-        |                               |
-        v                               v
-     ejecucion                      auditoria
-        |                               |
-        v                               v
-     resultado                       CodeQL
-        |                               |
-        +---------------+---------------+
-                        |
-                        v
-                     reporte
-
----
-
-Estado del proyecto
-
-Proyecto en desarrollo.
+Valores- se encuentra en desarrollo.
 
 Las prioridades actuales son:
 
-1. ordenar la arquitectura
-2. separar responsabilidades
-3. mantener seguridad de dependencias
-4. documentar componentes
-5. aislar conectores externos
-6. automatizar verificaciones
-7. mejorar trazabilidad y auditoria
+1. reducir el núcleo
+2. mantener la independencia
+3. separar responsabilidades
+4. mejorar la trazabilidad
+5. evitar dependencias innecesarias
+6. conservar una estructura verificable
 
-La prioridad arquitectonica es mantener una base pequena, modular y verificable antes de aumentar el numero de dependencias o integraciones.
+El desarrollo prioriza la claridad estructural antes que la incorporación de nuevas capas.
+
+---
+
+Principio
+
+La arquitectura puede resumirse en una regla:
+
+núcleo
+  |
+  v
+estructura
+  |
+  v
+observación
+  |
+  v
+resultado
+
+Los componentes externos, cuando sean necesarios, permanecen fuera del núcleo.
 
 ---
 
@@ -486,35 +173,8 @@ Apache 2.0
 
 ---
 
-Resumen arquitectonico
+Estado
 
-                         VALORES-
-                            |
-             +--------------+--------------+
-             |              |              |
-           Python       JavaScript      GitHub
-             |              |              |
-          modelos        Hardhat        Actions
-          runners        contratos      CodeQL
-          analisis       scripts          |
-             |              |              |
-             +--------------+--------------+
-                            |
-                         SEGURIDAD
-                            |
-                         AUDITORIA
-                            |
-                            v
-                         DECISION
+En desarrollo.
 
-La regla central es simple:
-
-logica interna
-      |
-      v
-interfaces controladas
-      |
-      v
-componentes externos
-
-Los componentes externos conectan, automatizan o verifican; la logica principal permanece separada.
+Valores- forma parte de la exploración y evolución del ecosistema Tapiz.
